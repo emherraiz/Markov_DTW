@@ -1,51 +1,17 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from  scipy.stats import norm
-
-def estado(v_inicial, m_transicion):
-    v_estado = [v_inicial]
-
-    for i in range(50):
-        v_estado.append(v_estado[-1] @ m_transicion)
-
-
-    return pd.DataFrame(v_estado)
-
-m_transicion = np.array([[.6, .2, .8],[.05, .9, .05],[.1, .2, .7]])
-v_inicial = np.array([.1, .8, .1])
-
-def equilibrium_distribution(p_transition):
-    """This implementation comes from Colin Carroll, who kindly reviewed the notebook"""
-    # Shape nos devuelve una lista con la dimensón de la matriz
-    n_states = p_transition.shape[0]
-
-    # eye nos da una matriz diagonal de unos
-    # Reshape nos hace una matriz primer_parametro * segundo_parametro * ... * n_parametro
-    A = np.append(
-        arr=p_transition.T - np.eye(n_states),
-        values=np.ones(n_states).reshape(1, -1),
-        axis=0
-    )
-
-    # lingalgmpinv nos devuelve la psudoinversa: (A^T * A)^{-1} * A^T
-    pinv = np.linalg.pinv(A)
-
-    # Devuelve la última columna
-    return pinv.T[-1]
-
-
-print(equilibrium_distribution(m_transicion))
-
-# Funcion de densidad
-
 class Normal:
+
     def __init__(self, mu, sigma):
-        # Valor esperado (media)
+        '''Este es el constructor
+
+        Args:
+            mu (float): Valor esperado (media)
+            sigma (float): Varianza
+        '''
         self.mu = mu
-        # Varianza
         self.sigma = sigma
-        # NOTA: no necesitamos de la
+
 
         # Instanciamos un objeto con la distribución normal
         self.dist = norm(loc = mu, scale = sigma)
@@ -66,6 +32,20 @@ class Normal:
     def sample(self, n):
         return self.dist.rvs(n)
 
-print(norm(loc=0, scale=1).rvs(10))
 
+def model_prob(mu, sigma, y):
+    # Probability of mu under prior.
+    normal_prior = Normal(0, 10)
+    mu_prob = normal_prior.pdf(mu)
+
+    # Probability of sigma under prior.
+    sigma_prior = Exponential(1)
+    sigma_prob = sigma_prior.pdf(sigma)
+
+    # Likelihood of data given mu and sigma
+    likelihood = Normal(mu, sigma)
+    likelihood_prob = likelihood.pdf(y).prod()
+
+    # Joint likelihood
+    return mu_prob * sigma_prob * likelihood_prob
 

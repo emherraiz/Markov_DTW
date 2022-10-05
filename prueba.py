@@ -1,4 +1,9 @@
-import numpy as np
+'''
+Utilizaremos este modulo para hacer un repaso del bayesiano
+
+Returns:
+    float: Probabilidad
+'''
 from scipy.stats import norm
 class Normal:
 
@@ -32,20 +37,4 @@ class Normal:
     def sample(self, n):
         return self.dist.rvs(n)
 
-
-def model_prob(mu, sigma, y):
-    # Probability of mu under prior.
-    normal_prior = Normal(0, 10)
-    mu_prob = normal_prior.pdf(mu)
-
-    # Probability of sigma under prior.
-    sigma_prior = Exponential(1)
-    sigma_prob = sigma_prior.pdf(sigma)
-
-    # Likelihood of data given mu and sigma
-    likelihood = Normal(mu, sigma)
-    likelihood_prob = likelihood.pdf(y).prod()
-
-    # Joint likelihood
-    return mu_prob * sigma_prob * likelihood_prob
 
